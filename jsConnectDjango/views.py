@@ -11,17 +11,20 @@ from .helpers.response import js_connect_response
 
 # Local imports
 from .forms import JsConnectForm
-
+from cwist import models
+from cwist.avatars.util import get_default_avatar_url
 
 # Our actual view
 def js_connect_auth_view(request):
     user = {}
     if request.user.is_authenticated():
         u = request.user
-        user['uniqueid'] = u.id
-        user['name'] = u.username
-        user['email'] = u.email
-        user['photourl'] = photo_helper.fetch_photo(u)
+        profile = models.get_profile(u)
+        if profile.is_parent:
+            user['uniqueid'] = u.id
+            user['name'] = profile.screenname
+            user['email'] = u.email
+            user['photourl'] = get_default_avatar_url(u)
 
     # Our sercret Server Data
     server_data = {
